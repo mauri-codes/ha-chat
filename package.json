@@ -1,0 +1,22 @@
+{
+  "name": "ha-chat",
+  "version": "1.0.0",
+  "description": "High Availability Real Time Chat Application",
+  "main": "index.js",
+  "scripts": {
+    "client": "cd client && yarn start",
+    "build": "cd client && yarn build",
+    "server": "cd server && yarn tsc && yarn server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mauri1789/ha-chat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mauri1789/ha-chat/issues"
+  },
+  "homepage": "https://github.com/mauri1789/ha-chat#readme"
+}
