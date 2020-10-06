@@ -1,2 +1,6 @@
 -e .
+
+boto3
 aws_cdk.aws_ecr
+aws_cdk.aws_ec2
+aws_cdk.aws_elasticloadbalancingv2
