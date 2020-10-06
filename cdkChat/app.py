@@ -13,6 +13,10 @@ environment = core.Environment(account=account, region="us-east-2")
 
 app = core.App()
 base = BaseStack(app, "chat-base", env=environment)
-cluster = ClusterStack(app, "chat-cluster", vpc=base.get_vpc(), env=environment)
+cluster = ClusterStack(app, "chat-cluster",
+    vpc=base.get_vpc(),
+    env=environment,
+    ecr_repo=base.get_erc_repo()
+)
 
 app.synth()

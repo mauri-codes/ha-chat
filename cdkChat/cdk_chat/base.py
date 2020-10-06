@@ -6,7 +6,7 @@ class BaseStack(core.Stack):
     
     def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
-        repository = ecr.Repository(self, "ChatRepo", repository_name="chat-ecr-repo")
+        self.repository = ecr.Repository(self, "ChatRepo", repository_name="chat-image")
         self.vpc = ec2.Vpc(self, "chat-vpc",
             cidr="10.0.0.0/16",
             subnet_configuration=[{ 
@@ -22,5 +22,5 @@ class BaseStack(core.Stack):
         #     description="Elastic Load Balancer for chat application",
         #     security_group_name="chat-elb-sg"
         # )
-
-        # The code that defines your stack goes here
+    def get_erc_repo(self):
+        return self.repository
