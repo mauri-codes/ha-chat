@@ -7,11 +7,16 @@ const io = require('socket.io')(http);
 app.use(express.static(path.join(__dirname, "build")));
 
 io.on('connection', (socket: any) => {
-  console.log('a user connected');
+  try {
+    console.log('a user connected');
+  } catch(e) {
+    console.log("error")
+    console.log(e)
+  }
 });
 
-http.listen(3001, () => {
-  console.log('listening on *:3001');
+http.listen(80, () => {
+  console.log('listening on *:80');
 });
 
 app.use((req:any, res:any, next:any) => {
