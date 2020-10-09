@@ -1,22 +1,64 @@
 import path from 'path'
 import http from 'http'
+import util from 'util'
+import { createClient } from 'redis'
+import redis_socket from 'socket.io-redis'
 import express, { Application } from 'express'
-import redis from 'socket.io-redis'
-import ioserver, { Socket, Server } from 'socket.io';
+import ioserver, { Socket, Server } from 'socket.io'
 
-const app:Application = express()
-const http_server = http.createServer(app)
-const ios:Server = ioserver(http_server)
-ios.adapter(redis({port: 6379 }))
+let app:Application = express()
+let http_server = http.createServer(app)
+let ios:Server = ioserver(http_server)
+ios.adapter(redis_socket({ port: 6379 }))
 
 app.use(express.static(path.join(__dirname, "build")))
 
+let redis = createClient()
+redis.on("connect", () => {
+   console.log("connected to redis")
+   redis.del(all_users, (err, ac) => {
+      console.log(ac)
+   })
+})
+
+interface ChatMessage {
+   message: string
+   recipient: string
+}
+interface User {
+   username: string
+   id: string
+}
+
+let redis_append = util.promisify(redis.append).bind(redis)
+let redis_lrem = util.promisify(redis.lrem).bind(redis)
+let redis_get = util.promisify(redis.get).bind(redis)
+let redis_set = util.promisify(redis.set).bind(redis)
+let all_users = "all_users"
+
 ios.on('connection', (socket: Socket) => {
-   socket.emit("login", {
-      "name": "received :)"
+   let id = socket.id
+   let user: User
+   let user_key: string
+   socket.on("register", async (username:string) => {
+      user_key = `${username}#${id}`
+      user = { username, id }
+
+      await redis_append(all_users, user_key)
+      let users = await redis_get(all_users)
+
+      socket.emit(all_users, {users})
+      socket.broadcast.emit(all_users, {users})
+      console.log(`${user_key} connected`)
+   })
+   socket.on("message", ({message, recipient}: ChatMessage) => {
+      socket.to(recipient).emit("message", {from: user, message})
+   })
+   socket.on("disconnect", async () => {
+      await redis_lrem(all_users, 1, user_key)
+      console.log(`disconnected user: ${user_key}`)
    })
 });
-
 http_server.listen(80, () => {
    console.log('listening on *:80');
 });
@@ -24,3 +66,4 @@ http_server.listen(80, () => {
 app.use((req:any, res:any, next:any) => {
    res.sendFile(path.join(__dirname, "build", "index.html"));
 });
+

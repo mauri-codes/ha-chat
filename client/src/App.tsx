@@ -8,8 +8,10 @@ function App() {
   console.log(socket.connected)
 
   socket.on('connect', () => {
-    socket.emit("connection", {client_info: "hi world"})
-    console.log("socket connected")
+    socket.emit("register", "mauri" + Math.floor(Math.random()*100))
+    socket.on("all_users", (data:any) => {
+      console.log(data)
+    })
   })
   socket.on('disconnect', () => {
     console.log(socket.connected)
