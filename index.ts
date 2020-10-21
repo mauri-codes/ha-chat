@@ -30,10 +30,12 @@ interface User {
    id: string
 }
 
-let redis_append = util.promisify(redis.append).bind(redis)
+let redis_lpush = util.promisify(redis.lpush).bind(redis)
+let redis_lpushx = util.promisify(redis.lpushx).bind(redis)
 let redis_lrem = util.promisify(redis.lrem).bind(redis)
 let redis_get = util.promisify(redis.get).bind(redis)
 let redis_set = util.promisify(redis.set).bind(redis)
+let redis_lrange = util.promisify(redis.lrange).bind(redis)
 let all_users = "all_users"
 
 ios.on('connection', (socket: Socket) => {
@@ -41,21 +43,20 @@ ios.on('connection', (socket: Socket) => {
    let user: User
    let user_key: string
    socket.on("register", async (username:string) => {
-      user_key = `${username}#${id}`
+      user_key = `${username}${id}`
       user = { username, id }
-
-      await redis_append(all_users, user_key)
-      let users = await redis_get(all_users)
-
-      socket.emit(all_users, {users})
-      socket.broadcast.emit(all_users, {users})
-      console.log(`${user_key} connected`)
+      redis.lpush(all_users, user_key, async function(err, data) {
+         let users = await redis_lrange(all_users, 0, -1)   
+         socket.emit(all_users, {users})
+         socket.broadcast.emit(all_users, {users})
+         console.log(`${user_key} connected`)
+      })
    })
    socket.on("message", ({message, recipient}: ChatMessage) => {
       socket.to(recipient).emit("message", {from: user, message})
    })
    socket.on("disconnect", async () => {
-      await redis_lrem(all_users, 1, user_key)
+      let result = await redis_lrem(all_users, 0, user_key)
       console.log(`disconnected user: ${user_key}`)
    })
 });

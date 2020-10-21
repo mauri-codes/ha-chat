@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components'
 import './App.css';
 import io from 'socket.io-client';
@@ -9,18 +9,23 @@ import { currentUser } from './context/currentUser'
 function AppComponent() {
    let loggedUser = sessionStorage.getItem("user") || ""
    let [user, setUser] = useState(loggedUser)
-   const socket = io("http://localhost");
-   console.log(socket.connected)
-
-   socket.on('connect', () => {
-      socket.emit("register", "mauri" + Math.floor(Math.random()*100))
-      socket.on("all_users", (data:any) => {
-         console.log(data)
-      })
-   })
-   socket.on('disconnect', () => {
-      console.log(socket.connected)
-   })
+   useEffect(() => {
+      if (user) {
+         const socket = io("http://localhost")
+         socket.on('connect', () => {
+            socket.emit("register", user)
+            socket.on("all_users", (data:any) => {
+               console.log(data)
+            })
+         })
+         socket.on('disconnect', () => {
+            console.log(socket.connected)
+         })
+   
+         return () => {socket.disconnect()};
+      }
+    }, [user]);
+   
    let signOut = () => {
       sessionStorage.removeItem("user")
       setUser("")
