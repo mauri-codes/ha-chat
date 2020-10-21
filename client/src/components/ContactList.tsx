@@ -9,16 +9,17 @@ function ContactListComponent() {
         "Erick", 
         "Ammanda"
     ]
-    let ContactList = styled.div`
-       display: flex;
-       flex-direction: column;
-       flex: 1 0 200px;
-    `
     return (
         <ContactList>
-            {contact_info && contact_info.map((contact) => (<ContactComponent user={contact} />))}
+            {contact_info && contact_info.map((contact) => (<ContactComponent key={contact} user={contact} />))}
         </ContactList>
     )
 }
 
 export { ContactListComponent }
+
+let ContactList = styled.div`
+display: flex;
+flex-direction: column;
+flex: 1 0 200px;
+`

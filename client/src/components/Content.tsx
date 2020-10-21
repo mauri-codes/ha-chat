@@ -3,17 +3,6 @@ import styled from 'styled-components'
 import { ContactListComponent } from './ContactList'
 
 function ContentComponent() {
-   let Messages = styled.div`
-      display: flex;
-      flex: 3 0 600px;
-    `
-   let Content = styled.div`
-      display: flex;
-      flex: 1 0 0;
-      max-height: calc(100% - 70px);
-      background-color: lightblue;
-      margin: 0 5%;
-   `
    return (
       <Content>
          <ContactListComponent />
@@ -23,3 +12,15 @@ function ContentComponent() {
 }
 
 export { ContentComponent }
+
+let Messages = styled.div`
+   display: flex;
+   flex: 3 0 600px;
+ `
+let Content = styled.div`
+   display: flex;
+   flex: 1 0 0;
+   max-height: calc(100% - 70px);
+   background-color: lightblue;
+   margin: 0 5%;
+`

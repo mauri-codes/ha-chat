@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components'
 import './App.css';
 import io from 'socket.io-client';
 import { ContentComponent } from './components/Content'
+import { LoginComponent } from './components/Login'
+import { currentUser } from './context/currentUser'
 
-function App() {
+function AppComponent() {
+   let loggedUser = sessionStorage.getItem("user") || ""
+   let [user, setUser] = useState(loggedUser)
    const socket = io("http://localhost");
    console.log(socket.connected)
 
@@ -17,93 +21,52 @@ function App() {
    socket.on('disconnect', () => {
       console.log(socket.connected)
    })
-   let Header = styled.header`
-      display: flex;
-      flex: 0 0 70px;
-      background-color: lightcoral;
-   `
-   let App = styled.div`
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      width: 100%;
-   `
+   let signOut = () => {
+      sessionStorage.removeItem("user")
+      setUser("")
+   }
    return (
       <App>
-         <Header />
-         <ContentComponent />
-         <LoginComponent />
+         <currentUser.Provider value= {{user, setUser}}>
+            <Header>
+               {user &&
+                  <Title>Hello {user}!</Title>
+               } {!user &&
+                  <Title>HA Chat</Title>
+               }
+               <SignOutButton onClick={signOut}>Sign Out</SignOutButton>
+            </Header>
+            <ContentComponent />
+            {user === "" &&
+               <LoginComponent />
+            }
+         </currentUser.Provider>
       </App>
    );
 }
 
-export default App;
+export default AppComponent;
 
-
-function LoginComponent() {
-   let Container = styled.div`
-      position: absolute;
-      display:flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0, 0.5);
-   `
-   let LoginBox = styled.div`
-      display: flex;
-      flex-direction: column;
-      width: 50%;
-      height: 30%;
-      background-color: gainsboro;
-      padding: 30px;
-   `
-   let Title = styled.div`
-      flex: 1 0 0;
-      font-size: 25px;
-      font-weight: bold;
-   `
-   let Form = styled.div`
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex: 3 0 0;
-      font-size: 20px;
-      input {
-         height: 22px;
-      }
-   `
-   let ButtonContainer = styled.div`
-      display: flex;
-      flex: 1 0 0;
-      flex-direction: row-reverse;
-      align-items: center;
-   `
-   let Button = styled.div`
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border:  1px solid black;
-      height: 28px;
-      width: 100px;
-      padding: 5px;
-      background-color: palegreen;
-      cursor: pointer;
-      &:hover{
-         background-color: lightgreen;
-      }
-   `
-   return (
-      <Container>
-         <LoginBox>
-         <Title>Login</Title>
-         <Form>
-            username:&nbsp;&nbsp; <input type="text"/>
-         </Form>
-         <ButtonContainer>
-            <Button>Sign In</Button>
-         </ButtonContainer>
-         </LoginBox>
-      </Container>
-   )
-}
+let Header = styled.header`
+   display: flex;
+   flex: 0 0 70px;
+   align-items: center;
+   justify-content: space-between;
+   background-color: lightsteelblue;
+`
+let Title = styled.div`
+   padding-left: 6%;
+   font-size: 25px;
+   font-weight: bold;
+`
+let SignOutButton = styled.div`
+   padding-right: 6%;
+   font-weight: bold;
+   cursor: pointer;
+`
+let App = styled.div`
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   width: 100%;
+`
