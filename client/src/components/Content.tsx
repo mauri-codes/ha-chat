@@ -21,6 +21,5 @@ let Content = styled.div`
    display: flex;
    flex: 1 0 0;
    max-height: calc(100% - 70px);
-   background-color: lightblue;
    margin: 0 5%;
 `

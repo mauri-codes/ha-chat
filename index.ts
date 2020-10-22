@@ -43,7 +43,7 @@ ios.on('connection', (socket: Socket) => {
    let user: User
    let user_key: string
    socket.on("register", async (username:string) => {
-      user_key = `${username}${id}`
+      user_key = `${username}..${id}`
       user = { username, id }
       redis.lpush(all_users, user_key, async function(err, data) {
          let users = await redis_lrange(all_users, 0, -1)   
@@ -56,7 +56,9 @@ ios.on('connection', (socket: Socket) => {
       socket.to(recipient).emit("message", {from: user, message})
    })
    socket.on("disconnect", async () => {
-      let result = await redis_lrem(all_users, 0, user_key)
+      await redis_lrem(all_users, 0, user_key)
+      let users = await redis_lrange(all_users, 0, -1)   
+      socket.broadcast.emit(all_users, {users})
       console.log(`disconnected user: ${user_key}`)
    })
 });

@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { usersContext } from '../context/userContext'
 
 function ContactComponent ({user}: {user:string}) {
-
+    let userContext = useContext(usersContext)
+    let currentUser = userContext?.chatUser || ""
+    let setCurrentUser = () => userContext?.setChatUser(user)
+    
     return (
-        <Contact>
+        <Contact user={user} currentUser={currentUser} onClick={setCurrentUser} >
             <Icon>
                 <FontAwesomeIcon icon={faUser} />
             </Icon>
@@ -20,10 +24,22 @@ export { ContactComponent }
 let Contact = styled.div`
 display: flex;
 align-items: center;
-width: 100%;
 height: 70px;
 padding: 10px;
 padding-left: 20px;
+cursor: pointer;
+background-color: ${({user, currentUser}: {user: string, currentUser: string}) => {
+    if (user === currentUser)
+        return 'silver'
+    return "white"
+}};
+&:hover {
+    background-color: ${({user, currentUser}: {user: string, currentUser: string}) => {
+    if (user === currentUser)
+        return 'silver'
+    return "gainsboro"
+}};
+}
 `
 let Icon = styled.div`
 flex: 0 0 30px;

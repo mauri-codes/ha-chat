@@ -4,18 +4,26 @@ import './App.css';
 import io from 'socket.io-client';
 import { ContentComponent } from './components/Content'
 import { LoginComponent } from './components/Login'
-import { currentUser } from './context/currentUser'
+import { usersContext, User } from './context/userContext'
 
 function AppComponent() {
    let loggedUser = sessionStorage.getItem("user") || ""
    let [user, setUser] = useState(loggedUser)
+   let [userList, setUserList] = useState<User[]>([])
+   let [chatUser, setChatUser] = useState("")
    useEffect(() => {
       if (user) {
          const socket = io("http://localhost")
          socket.on('connect', () => {
             socket.emit("register", user)
-            socket.on("all_users", (data:any) => {
-               console.log(data)
+            socket.on("all_users", ({users}: {users:string[]}) => {
+               let contactList = users
+                  .map(userKey => {
+                     let [name, id] = userKey.split('..')
+                     return {name, id}
+                  })
+                  .filter(userObject => userObject.name !== user)
+               setUserList(contactList)
             })
          })
          socket.on('disconnect', () => {
@@ -32,7 +40,7 @@ function AppComponent() {
    }
    return (
       <App>
-         <currentUser.Provider value= {{user, setUser}}>
+         <usersContext.Provider value= {{user, setUser, userList, chatUser, setChatUser}}>
             <Header>
                {user &&
                   <Title>Hello {user}!</Title>
@@ -45,7 +53,7 @@ function AppComponent() {
             {user === "" &&
                <LoginComponent />
             }
-         </currentUser.Provider>
+         </usersContext.Provider>
       </App>
    );
 }

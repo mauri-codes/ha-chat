@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
 import styled from 'styled-components'
-import { currentUser } from '../context/currentUser'
+import { usersContext } from '../context/userContext'
 
 
 function LoginComponent() {
    let [userInput, setUserInput] = useState("")
    let handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => setUserInput(event.currentTarget.value)
-   let userContext = useContext(currentUser)
+   let userContext = useContext(usersContext)
    let signIn = () => {
       sessionStorage.setItem("user", userInput)
       userContext?.setUser(userInput)
