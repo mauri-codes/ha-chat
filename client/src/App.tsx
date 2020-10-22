@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components'
 import './App.css';
-import io from 'socket.io-client';
 import { ContentComponent } from './components/Content'
 import { LoginComponent } from './components/Login'
 import { usersContext, User } from './context/userContext'
+import { Socket } from './Socket'
 
 function AppComponent() {
    let loggedUser = sessionStorage.getItem("user") || ""
@@ -13,24 +13,8 @@ function AppComponent() {
    let [chatUser, setChatUser] = useState("")
    useEffect(() => {
       if (user) {
-         const socket = io("http://localhost")
-         socket.on('connect', () => {
-            socket.emit("register", user)
-            socket.on("all_users", ({users}: {users:string[]}) => {
-               let contactList = users
-                  .map(userKey => {
-                     let [name, id] = userKey.split('..')
-                     return {name, id}
-                  })
-                  .filter(userObject => userObject.name !== user)
-               setUserList(contactList)
-            })
-         })
-         socket.on('disconnect', () => {
-            console.log(socket.connected)
-         })
-   
-         return () => {socket.disconnect()};
+         let socket = new Socket(user, setUserList)
+         return () => socket.disconnect()
       }
     }, [user]);
    
