@@ -5,7 +5,7 @@ function MessageBoxComponent ({messages}: {messages: {recipient: string, message
    return (
       <Messages>
          {messages.map(message => (
-            <Message key={`${message.recipient}-${Math.floor(Math.random() * 1000)}`}>
+            <Message key={`${message.recipient}-${Math.floor(Math.random() * 10000)}`}>
                <div><b>{message.recipient}: </b></div>
                <div>{message.message}</div>
             </Message>

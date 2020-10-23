@@ -9,6 +9,7 @@ function MessagesComponent({socket}: {socket: Socket | null}) {
    let [messages, setMessages] = useState<any>({"no-user": []})
    let handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setUserInput(event.currentTarget.value)
    let userContext = useContext(usersContext)
+   let user = userContext?.user || ""
    let chatUser = userContext?.chatUser
    let chatUserName = "no-user"
    let chatUserId = "no-user"
@@ -19,16 +20,22 @@ function MessagesComponent({socket}: {socket: Socket | null}) {
    let sendMessage = () => {
       if (userInput != "") {
          socket?.emitMessage(chatUserId, userInput)
-         pushMessage(chatUserName || "", userInput)
+         pushMessage(chatUserName || "", userInput, user)
+         setUserInput("")
       }
    }
-   let pushMessage = (user: string, text: string) => {
+   let pushMessage = (user: string, text: string, sender: string) => {
       if (!messages[user]) {
          messages[user] = []
       }
       let new_messages = {...messages}
-      new_messages[user] = [...messages[user], {recipient: user, message: text}]
+      new_messages[user] = [{recipient: sender, message: text}, ...messages[user]]
       setMessages(new_messages)
+   }
+   let onEnter = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (event.key === 'Enter') {
+         sendMessage()
+       }
    }
    socket?.receiveMessage(pushMessage)
    return (
@@ -37,7 +44,7 @@ function MessagesComponent({socket}: {socket: Socket | null}) {
          <EditSection>
             <TextBox>
                {
-                  chatUser && <textarea  value={userInput} onChange={handleInputChange}></textarea>
+                  chatUser && <textarea  value={userInput} onChange={handleInputChange} onKeyDown={onEnter}></textarea>
                }
             </TextBox>
             {

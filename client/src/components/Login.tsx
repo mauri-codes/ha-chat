@@ -8,8 +8,15 @@ function LoginComponent() {
    let handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => setUserInput(event.currentTarget.value)
    let userContext = useContext(usersContext)
    let signIn = () => {
-      sessionStorage.setItem("user", userInput)
-      userContext?.setUser(userInput)
+      if (userInput) {
+         sessionStorage.setItem("user", userInput)
+         userContext?.setUser(userInput)
+      }
+   }
+   let onEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+         signIn()
+       }
    }
    return (
       <Container>
@@ -17,7 +24,7 @@ function LoginComponent() {
             <Title>Login</Title>
             <div>{userContext?.user}</div>
             <Form>
-               username:&nbsp;&nbsp; <input value={userInput} onChange={handleInputChange} type="text"/>
+               username:&nbsp;&nbsp; <input value={userInput} onChange={handleInputChange} type="text"  onKeyDown={onEnter} />
             </Form>
             <ButtonContainer>
                <Button onClick={signIn}>Sign In</Button>

@@ -25,11 +25,9 @@ class Socket {
          })
       })
    }
-   receiveMessage(callback: (user: string, text: string) => void) {
+   receiveMessage(pushMessage: (user: string, text: string, sender: string) => void) {
       this.socket.on("message", (data: IncommingMessage) => {
-         console.log("hi world")
-         console.log(data)
-         callback(data.from.username, data.message)
+         pushMessage(data.from.username, data.message, data.from.username)
       })
    }
    emitMessage(recipient: string, message: string) {

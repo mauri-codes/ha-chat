@@ -4,12 +4,6 @@ import { ContactComponent } from './Contact'
 import { usersContext } from '../context/userContext'
 
 function ContactListComponent() {
-   let contact_info = [
-      "Rebecca",
-      "Tito",
-      "Erick", 
-      "Ammanda"
-   ]
    let userContext = useContext(usersContext)
    return (
       <ContactList>
