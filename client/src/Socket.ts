@@ -4,6 +4,10 @@ interface IncommingMessage {
    from: {username: string}
    message: string
 }
+interface receiveMessageProps {
+   pushMessage: (user: string, text: string, sender: string) => void
+   addNotification: (user: string) => void
+}
 
 class Socket {
     socket = io("http://localhost")
@@ -25,9 +29,12 @@ class Socket {
          })
       })
    }
-   receiveMessage(pushMessage: (user: string, text: string, sender: string) => void) {
+
+   receiveMessage({pushMessage, addNotification}: receiveMessageProps ) {
       this.socket.on("message", (data: IncommingMessage) => {
-         pushMessage(data.from.username, data.message, data.from.username)
+         let user = data.from.username
+         pushMessage(user, data.message, user)
+         addNotification(user)
       })
    }
    emitMessage(recipient: string, message: string) {

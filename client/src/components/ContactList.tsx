@@ -1,13 +1,26 @@
-import React, { useContext } from 'react';
+import React, { useContext, Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components'
 import { ContactComponent } from './Contact'
 import { usersContext } from '../context/userContext'
 
-function ContactListComponent() {
+interface ContactListProps {
+   notifications: string[],
+   setNotifications: Dispatch<SetStateAction<string[]>>
+}
+function ContactListComponent({notifications, setNotifications}: ContactListProps) {
    let userContext = useContext(usersContext)
    return (
       <ContactList>
-         {(userContext?.userList || []).map((contact) => (<ContactComponent key={`${contact.name}..${contact.id}`} user={`${contact.name}..${contact.id}`} />))}
+         {(userContext?.userList || []).map(
+            (contact) => (
+               <ContactComponent
+                  setNotifications = {setNotifications}
+                  key={`${contact.id}`}
+                  user={`${contact.name}..${contact.id}`}
+                  notifications = {notifications}
+                  />
+            )
+         )}
       </ContactList>
    )
 }

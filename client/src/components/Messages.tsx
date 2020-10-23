@@ -1,10 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, Dispatch, SetStateAction } from 'react';
 import { Socket } from '../Socket'
 import styled from 'styled-components'
 import { MessageBoxComponent } from './MessageBox'
 import { usersContext } from '../context/userContext'
-
-function MessagesComponent({socket}: {socket: Socket | null}) {
+interface MessagesComponentProps {
+   socket: Socket | null,
+   notifications: string[],
+   setNotifications: Dispatch<SetStateAction<string[]>>
+}
+function MessagesComponent({socket, notifications, setNotifications}:MessagesComponentProps) {
    let [userInput, setUserInput] = useState("")
    let [messages, setMessages] = useState<any>({"no-user": []})
    let handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setUserInput(event.currentTarget.value)
@@ -24,6 +28,14 @@ function MessagesComponent({socket}: {socket: Socket | null}) {
          setUserInput("")
       }
    }
+   let addNotification = (user: string) => {
+      let previous = notifications.some(notification => notification === user)
+      let new_notifications
+      if (!previous) {
+         new_notifications = [...notifications, user]
+         setNotifications(new_notifications)
+      }
+   }
    let pushMessage = (user: string, text: string, sender: string) => {
       if (!messages[user]) {
          messages[user] = []
@@ -37,7 +49,7 @@ function MessagesComponent({socket}: {socket: Socket | null}) {
          sendMessage()
        }
    }
-   socket?.receiveMessage(pushMessage)
+   socket?.receiveMessage({pushMessage, addNotification})
    return (
       <MessageSection>
          <MessageBoxComponent messages={chatUser ? (messages[chatUserName] ? messages[chatUserName]: []) : []} />

@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components'
 import { ContactListComponent } from './ContactList'
 import { MessagesComponent } from './Messages'
 import { Socket } from '../Socket'
 
 function ContentComponent({socket}: {socket: Socket | null}) {
+   let [notifications, setNotifications] = useState<string[]>([])
    return (
       <Content>
-         <ContactListComponent />
-         <MessagesComponent socket={socket} ></MessagesComponent>
+         <ContactListComponent notifications = {notifications} setNotifications= {setNotifications} />
+         <MessagesComponent
+            socket={socket}
+            notifications = {notifications}
+            setNotifications = {setNotifications}
+         />
       </Content>
    )
 }
