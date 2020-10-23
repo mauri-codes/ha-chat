@@ -9,11 +9,13 @@ import { Socket } from './Socket'
 function AppComponent() {
    let loggedUser = sessionStorage.getItem("user") || ""
    let [user, setUser] = useState(loggedUser)
+   let [socket, setSocket] = useState<Socket | null>(null)
    let [userList, setUserList] = useState<User[]>([])
    let [chatUser, setChatUser] = useState("")
    useEffect(() => {
       if (user) {
          let socket = new Socket(user, setUserList)
+         setSocket(socket)
          return () => socket.disconnect()
       }
     }, [user]);
@@ -33,7 +35,7 @@ function AppComponent() {
                }
                <SignOutButton onClick={signOut}>Sign Out</SignOutButton>
             </Header>
-            <ContentComponent />
+            <ContentComponent socket={socket} />
             {user === "" &&
                <LoginComponent />
             }

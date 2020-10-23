@@ -2,12 +2,13 @@ import React from 'react';
 import styled from 'styled-components'
 import { ContactListComponent } from './ContactList'
 import { MessagesComponent } from './Messages'
+import { Socket } from '../Socket'
 
-function ContentComponent() {
+function ContentComponent({socket}: {socket: Socket | null}) {
    return (
       <Content>
          <ContactListComponent />
-         <MessagesComponent></MessagesComponent>
+         <MessagesComponent socket={socket} ></MessagesComponent>
       </Content>
    )
 }

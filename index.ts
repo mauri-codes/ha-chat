@@ -52,9 +52,8 @@ ios.on('connection', (socket: Socket) => {
          console.log(`${user_key} connected`)
       })
    })
-   socket.on("message", ({message, recipient}: ChatMessage) => {
-      console.log(":)")
-      // socket.to(recipient).emit("message", {from: user, message})
+   socket.on("message", ({message, recipient}: ChatMessage) => {      
+      socket.to(recipient).emit("message", {from: user, message})
    })
    socket.on("disconnect", async () => {
       await redis_lrem(all_users, 0, user_key)

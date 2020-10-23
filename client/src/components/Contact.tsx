@@ -14,7 +14,7 @@ function ContactComponent ({user}: {user:string}) {
             <Icon>
                 <FontAwesomeIcon icon={faUser} />
             </Icon>
-            <Text>{user}</Text>
+            <Text>{user.split("..")[0]}</Text>
         </Contact>
     )
 }

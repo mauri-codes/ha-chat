@@ -1,19 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { Socket } from '../Socket'
 import styled from 'styled-components'
+import { MessageBoxComponent } from './MessageBox'
+import { usersContext } from '../context/userContext'
 
-function MessagesComponent() {
+function MessagesComponent({socket}: {socket: Socket | null}) {
    let [userInput, setUserInput] = useState("")
+   let [messages, setMessages] = useState<any>({"no-user": []})
    let handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setUserInput(event.currentTarget.value)
+   let userContext = useContext(usersContext)
+   let chatUser = userContext?.chatUser
+   let chatUserName = "no-user"
+   let chatUserId = "no-user"
+   if (chatUser) {
+      chatUserName = chatUser?.split("..")[0]
+      chatUserId = chatUser?.split("..")[1]
+   }
+   let sendMessage = () => {
+      if (userInput != "") {
+         socket?.emitMessage(chatUserId, userInput)
+         pushMessage(chatUserName || "", userInput)
+      }
+   }
+   let pushMessage = (user: string, text: string) => {
+      if (!messages[user]) {
+         messages[user] = []
+      }
+      let new_messages = {...messages}
+      new_messages[user] = [...messages[user], {recipient: user, message: text}]
+      setMessages(new_messages)
+   }
+   socket?.receiveMessage(pushMessage)
    return (
       <MessageSection>
-         <Messages></Messages>
+         <MessageBoxComponent messages={chatUser ? (messages[chatUserName] ? messages[chatUserName]: []) : []} />
          <EditSection>
             <TextBox>
-               <textarea  value={userInput} onChange={handleInputChange}></textarea>
+               {
+                  chatUser && <textarea  value={userInput} onChange={handleInputChange}></textarea>
+               }
             </TextBox>
-            <ButtonSection>
-               SEND
-            </ButtonSection>
+            {
+               chatUser &&
+               <ButtonSection onClick={sendMessage} >
+                  SEND
+               </ButtonSection>
+            }
          </EditSection>
       </MessageSection>
    )
@@ -26,9 +58,6 @@ let MessageSection = styled.div`
    flex-direction: column;
    height: 100%;
    flex: 3 0 600px;
-`
-let Messages = styled.div`
-   flex: 1 0 0;
 `
 let TextBox = styled.div`
    display: flex;

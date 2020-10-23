@@ -13,7 +13,7 @@ function ContactListComponent() {
    let userContext = useContext(usersContext)
    return (
       <ContactList>
-         {contact_info && (userContext?.userList || []).map((contact) => (<ContactComponent key={contact.name} user={contact.name} />))}
+         {(userContext?.userList || []).map((contact) => (<ContactComponent key={`${contact.name}..${contact.id}`} user={`${contact.name}..${contact.id}`} />))}
       </ContactList>
    )
 }
